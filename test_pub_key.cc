@@ -73,7 +73,9 @@ int main(int argc, char* argv[]){
 
     char *ecChar = EC_POINT_point2hex(m_gp, ec_point_pk, POINT_CONVERSION_COMPRESSED, ctxptr.get());
 
-    std::cout << std::string(ecChar) << std::endl; 
+    std::string second_key(ecChar);
+    std::cout << second_key << std::endl; 
+    assert (second_key == hexStr);
     OPENSSL_free(ecChar);
     std::cout << "Ending" << std::endl; 
     

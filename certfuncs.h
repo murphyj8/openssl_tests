@@ -21,9 +21,16 @@ inline void help_openssl_free_char(char* p) { OPENSSL_free(p); }
 inline void help_openssl_free_uchar(unsigned char* p) { OPENSSL_free(p); }
 
 
+// curve to use
+const int nid = NID_secp384r1;
+//const int nid = NID_secp256k1; 
+
 using ocsp_ptr = std::unique_ptr<OCSP_REQUEST, decltype(&OCSP_REQUEST_free)>; 
 using file_ptr = std::unique_ptr<FILE, int(*)(FILE*)>; 
 using x509_ptr = std::unique_ptr<X509, decltype(&X509_free)>;
+using x509_req_ptr = std::unique_ptr<X509_REQ, decltype(&X509_REQ_free)>;
+using x509_name_ptr = std::unique_ptr<X509_NAME, decltype(&X509_NAME_free)>;
+
 using bio_mem_ptr = std::unique_ptr<BIO, decltype(&BIO_free)>;
 
 // added types for loading private keys
@@ -68,9 +75,20 @@ bool LoadECPrivateKeyFromFile(const std::string&, EC_KEY_ptr&);
 
 // x509 functions
 bool LoadX509FromFile(const std::string, x509_ptr&);
+bool LoadX09CSRFromFile(const std::string&, x509_req_ptr&);
 std::string PubKeyPemFromCert(const x509_ptr&);
 bool IsTempX509(const x509_ptr&); 
+std::unique_ptr<unsigned char[]> X509_TBS(const x509_ptr&, int&);
+x509_ptr CreateFromCSR(const x509_req_ptr&, const std::string&);
+bool WriteX509Cert(const x509_ptr&, const std::string&);
 
+// CSR functions
+x509_req_ptr generate_cert_req(const std::string&, const std::string&);
+bool WriteCSR(const x509_req_ptr&, const std::string&); 
+
+// X509 Name structure 
+x509_name_ptr CreateSubject(const std::string&, const std::string&, const std::string&, 
+                            const std::string&, const std::string&, const std::string&);
 // Secret Sharing
 std::string CreateSecret(const std::string&, const EC_KEY_ptr&);
 #endif //#ifndef __CERT_FUNC_H__
